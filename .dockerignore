@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+
+# Python caches / build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments (rebuilt inside the image by `uv sync`)
+.venv/
+venv/
+env/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Local caches
+.cache/
+
+# Docker
+.dockerignore
+
+# Root-level scratch / generated artifacts (not needed in the image)
+/graph.png
+/table.tsv
+/form.html
+/Dockefile
+/blocks_common_parameters.csv
+/blocks_specific_parameters.csv
+
+# creds
+google_service_account.json

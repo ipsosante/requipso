@@ -1,0 +1,1 @@
+touch $WORKSPACE_DIR/test_init.txt

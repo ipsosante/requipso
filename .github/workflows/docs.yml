@@ -1,0 +1,87 @@
+# Publie la documentation versionnée sur GitHub Pages à chaque tag vX.Y.Z.
+# mike écrit la version sur la branche gh-pages (alias « latest », redirection à la racine).
+# À activer une fois : Settings → Pages → Deploy from branch « gh-pages », dossier « / (root) ».
+
+name: Documentation
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # mike recopie origin/gh-pages en branche locale, puis commite dessus.
+      # --ignore-remote-status désactive cette copie : le commit n'a pas de
+      # parent, et GitHub refuse le push (non-fast-forward).
+      - name: Récupérer la branche de documentation
+        run: git fetch origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages || true
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Installer le projet
+        run: uv sync --frozen --group docs
+
+      - name: Vérifier que le tag correspond à la version
+        run: |
+          version=$(uv run python -c "import tomllib, pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$tag" != "$version" ]; then
+            echo "Le tag '$GITHUB_REF_NAME' ne correspond pas à la version '$version' de pyproject.toml." >&2
+            exit 1
+          fi
+
+      - name: Définir l'adresse du site
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          uv run python - <<'PY'
+          import os
+          from pathlib import Path
+
+          url = f"https://{os.environ['OWNER']}.github.io/{os.environ['REPO']}/"
+          path = Path("requipso/docs/mkdocs.yml")
+          text = path.read_text()
+          needle = "site_name: Requipso\n"
+          if needle not in text:
+              raise SystemExit("Ligne « site_name » introuvable dans mkdocs.yml")
+          path.write_text(text.replace(needle, needle + f"site_url: {url}\n", 1))
+          print(url)
+          PY
+
+      - name: Publier la version
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          uv run mike deploy \
+            -F requipso/docs/mkdocs.yml \
+            --push \
+            --update-aliases \
+            --alias-type redirect \
+            --title "$GITHUB_REF_NAME" \
+            "$version" latest
+          uv run mike set-default \
+            -F requipso/docs/mkdocs.yml \
+            --push \
+            latest

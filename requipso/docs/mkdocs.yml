@@ -1,0 +1,140 @@
+site_name: Requipso
+site_description: Requêteur de données de santé piloté par Google Sheet
+# site_url est ajouté par le workflow GitHub au moment de la publication.
+docs_dir: pages
+site_dir: ../../site
+repo_url: https://github.com/ipsosante/requipso
+repo_name: ipsosante/requipso
+edit_uri: ""
+exclude_docs: |
+  __pycache__/
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  version:
+    provider: mike
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  language: fr
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+
+plugins:
+  - search:
+      lang: fr
+  - macros:
+      module_name: macros
+      on_error_fail: true
+  - mike:
+      # GitHub Pages ne sert pas les liens symboliques : l'alias « latest » est une redirection.
+      alias_type: redirect
+      canonical_version: latest
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Accueil: index.md
+  - Guide utilisateur:
+      - guide/demarrage.md
+      - guide/google-sheet.md
+      - guide/onglet-projet.md
+      - guide/onglet-inclusion.md
+      - guide/onglet-tableau-descriptif.md
+      - guide/parametres.md
+      - guide/combiner-blocs.md
+      - guide/application.md
+      - guide/exemple-complet.md
+      - guide/erreurs.md
+  - Catalogue des blocs:
+      - blocs/index.md
+      - Patient:
+          - blocs/age.md
+          - blocs/est-vivant.md
+          - blocs/genre.md
+          - blocs/departement.md
+          - blocs/code-postal.md
+          - blocs/paquet-annees.md
+      - Parcours de soins:
+          - blocs/medecin-traitant.md
+          - blocs/consultations.md
+      - Couverture:
+          - blocs/ald.md
+          - blocs/insurance.md
+      - Antécédents:
+          - blocs/cim10.md
+          - blocs/cisp2.md
+      - Prescriptions:
+          - blocs/prescription-atc.md
+          - blocs/regex-prescription.md
+      - Biométrie:
+          - blocs/biometry.md
+      - Texte libre (NLP):
+          - blocs/regex-nlp.md
+          - blocs/regex-consultation.md
+          - blocs/regex-patient-observation.md
+  - Fonctionnement interne:
+      - technique/architecture.md
+      - technique/donnees.md
+      - technique/blocs-internes.md
+      - technique/parametres-internes.md
+      - technique/chargement-sheet.md
+      - technique/pipeline.md
+      - technique/tableau-descriptif.md
+      - technique/nlp.md
+      - technique/ajouter-un-bloc.md
+      - technique/export-signatures.md
+      - technique/developpement.md
