@@ -4,7 +4,7 @@
 
 Tout d'abord les dépendances:
 
-````
+```
 sudo apt update
 sudo apt install build-essential graphviz
 ```
@@ -18,25 +18,14 @@ uv sync
 
 ## Données 
 
-Pour l'instant, il faut télécharger les données depuis l'instance ETL sur AWS.
-
-> Demander l'accès à l'infra
-
-Une fois accès à la machine, il faut télécharger les données
-
-```
-tsh login
-tsh scp teleport@django-etl-website-prod-aws-eu-west-3a:/tmp/final_data.zip ./final_data.zip
-```
-
-Ensuite dézipper avec le mot de passe nommé "Clé chiffrement export RED" sur 1Password
-
+Demander à l"équipe RED d'ipso de vous fournir les données finales de l'ETL (ensemble de fichiers parquets)
 
 
 ## Démo
 
 Pour lancer la démo: `uv run requipso`.  
 Cela devrait ouvrir:  
+
 * un onglet sur navigateur
 * un autre onglet contenant la documentation
 
