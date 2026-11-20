@@ -9,6 +9,8 @@ def _():
     import json
     from pathlib import Path
 
+    from importlib.metadata import version
+
     import marimo as mo
 
     config_path = Path(__file__).parent / ".requipso_last.json"
@@ -29,15 +31,18 @@ def _():
             )
         )
 
+    version=version("requipso")
     last_config = load_config()
-    return Path, last_config, mo, save_config
+    return Path, last_config, mo, save_config, version
 
 
 @app.cell
-def _(mo):
-    mo.md("""
-    # Requipso
-    """)
+def _(mo, version):
+    mo.md(
+        "# Requipso\n\n"
+        + f"* Version installée: {version}\n"
+        + "* [Documentation en ligne](https://ipsosante.github.io/requipso/)"
+    )
     return
 
 
@@ -249,7 +254,6 @@ def _(
             mo.ui.table(stats, label="Statistiques descriptives", page_size=100),
         ]
     )
-
     return
 
 
