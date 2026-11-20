@@ -1,7 +1,7 @@
 [project]
 name = "requipso"
-version = "0.2.2"
-description = "Add your description here"
+version = "0.2.3"
+description = "Requêteur de données de santé ipso santé"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
@@ -60,7 +60,7 @@ build-backend = "setuptools.build_meta"
 include = ["requipso*"]
 
 [tool.setuptools.package-data]
-requipso = ["docs/mkdocs.yml", "docs/pages/**/*"]
+requipso = ["google_oauth_client.json", "docs/mkdocs.yml", "docs/pages/**/*"]
 
 [tool.uv]
 default-groups = ["docs"]

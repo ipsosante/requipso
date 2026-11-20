@@ -47,6 +47,97 @@ def _(mo, version):
 
 
 @app.cell
+def _(mo):
+    import graphviz as _graphviz
+
+    try:
+        _graphviz_version = _graphviz.version()
+        _graphviz_status = mo.md("")
+    except _graphviz.ExecutableNotFound:
+        _graphviz_status = mo.vstack(
+            [
+                mo.md(
+                    "⚠️ **Graphviz executable n'est pas installé ou n'est pas dans le PATH.**\n"
+                    "Installez Graphviz via un terminal (voir plus bas), puis relancez requipso :"
+                ),
+                mo.ui.tabs(
+                    {
+                        "macOS": mo.md(
+                            """
+    ### Installer Graphviz sur macOS
+
+    Avec Homebrew :
+
+    ```bash
+    brew install graphviz
+    ```
+
+    Vérifier l'installation :
+
+    ```bash
+    dot -V
+    ```
+    """
+                        ),
+                        "Linux / WSL": mo.md(
+                            """
+    ### Installer Graphviz sur Linux ou WSL
+
+    Debian / Ubuntu / WSL Ubuntu :
+
+    ```bash
+    sudo apt update
+    sudo apt install graphviz
+    ```
+
+    Fedora :
+
+    ```bash
+    sudo dnf install graphviz
+    ```
+
+    Vérifier l'installation :
+
+    ```bash
+    dot -V
+    ```
+    """
+                        ),
+                        "Windows": mo.md(
+                            """
+    ### Installer Graphviz sur Windows
+
+    Avec winget :
+
+    ```powershell
+    winget install graphviz
+    ```
+
+    Ou avec Chocolatey :
+
+    ```powershell
+    choco install graphviz
+    ```
+
+    Après installation, ouvrez un nouveau terminal et vérifiez :
+
+    ```powershell
+    dot -V
+    ```
+
+    Si la commande n'est pas reconnue, ajoutez le dossier `bin` de Graphviz au `PATH` Windows, puis redémarrez le terminal.
+    """
+                        ),
+                    }
+                ),
+            ]
+        )
+
+    _graphviz_status
+    return
+
+
+@app.cell
 def _(Path, last_config, mo):
     _initial = (
         Path(last_config["data_dir"]).parent
