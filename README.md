@@ -16,6 +16,12 @@ cd requipso
 uv sync
 ```
 
+Vous pouvez également lancer le requêteur directement depuis PyPi (sans avoir à cloner)
+
+```
+uvx requipso
+```
+
 ## Données 
 
 Demander à l"équipe RED d'ipso de vous fournir les données finales de l'ETL (ensemble de fichiers parquets)
