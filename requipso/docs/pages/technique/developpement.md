@@ -121,12 +121,11 @@ L'image installe le projet avec `uv sync --frozen` dans `/opt/python` et lance
 
 ## Publication d'une version
 
-Deux workflows GitHub Actions partent du même tag `vX.Y.Z` :
-
-| Workflow | Fichier | Effet |
-| --- | --- | --- |
-| Build and publish | `.github/workflows/publish.yml` | Envoie le paquet sur [PyPI](https://pypi.org/p/requipso). |
-| Documentation | `.github/workflows/docs.yml` | Ajoute cette documentation sur la branche `gh-pages`. |
+| Workflow | Fichier | Déclencheur | Effet |
+| --- | --- | --- | --- |
+| Build and publish | `.github/workflows/publish.yml` | tag `vX.Y.Z` | Envoie le paquet sur [PyPI](https://pypi.org/p/requipso). |
+| Documentation | `.github/workflows/docs.yml` | push sur `main` | Version `main` du site, mise à jour à chaque commit sur cette branche. |
+| Documentation | `.github/workflows/docs.yml` | tag `vX.Y.Z` | Version `X.Y.Z`, alias `latest`. La racine du site redirige vers `latest`. |
 
 Le paquet s'installe ensuite avec :
 
@@ -157,7 +156,7 @@ La publication sur PyPI utilise [Trusted Publishing](https://docs.pypi.org/trust
 
 Le tag, sans le `v` initial, doit être exactement la version de `pyproject.toml`. Sinon le job s'arrête avant l'envoi.
 
-`publish.yml` construit le paquet avec `uv build` (sdist et wheel) à chaque pull request et à chaque push sur `main`, et ne le publie que pour un tag. Le wheel contient le code, `google_oauth_client.json` et `requipso/docs/` (déclarés dans `[tool.setuptools.package-data]`). Le groupe `docs` de `pyproject.toml` (MkDocs) n'est pas une dépendance du paquet : une installation PyPI lance l'application sans servir ce site. Le site public est celui publié sur `gh-pages`.
+`publish.yml` construit le paquet avec `uv build` (sdist et wheel) à chaque pull request et à chaque push sur `main`, et ne le publie que pour un tag. Le wheel contient le code, `google_oauth_client.json` et `requipso/docs/` (déclarés dans `[tool.setuptools.package-data]`). Le groupe `docs` de `pyproject.toml` (MkDocs) n'est pas une dépendance du paquet : une installation PyPI lance l'application sans servir ce site. Le site public est celui publié sur `gh-pages` : `main` suit la branche, `latest` reste la dernière version taguée.
 
 !!! warning "Une version PyPI ne se remplace pas"
     PyPI refuse un second envoi du même numéro. Pour corriger un paquet déjà publié, il faut incrémenter `version` et pousser un nouveau tag. Relancer le workflow d'un tag existant réutilise le fichier de workflow **tel qu'il est dans ce tag**, pas celui de `main`.

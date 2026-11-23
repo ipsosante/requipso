@@ -1,11 +1,14 @@
-# Publie la documentation versionnée sur GitHub Pages à chaque tag vX.Y.Z.
-# mike écrit la version sur la branche gh-pages (alias « latest », redirection à la racine).
+# Publie la documentation sur GitHub Pages.
+# - push sur main : version « main » (la branche, écrasée à chaque push)
+# - tag vX.Y.Z : version X.Y.Z, alias « latest » (redirection à la racine)
 # À activer une fois : Settings → Pages → Deploy from branch « gh-pages », dossier « / (root) ».
 
 name: Documentation
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
@@ -39,6 +42,7 @@ jobs:
         run: uv sync --frozen --group docs
 
       - name: Vérifier que le tag correspond à la version
+        if: github.ref_type == 'tag'
         run: |
           version=$(uv run python -c "import tomllib, pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
           tag="${GITHUB_REF_NAME#v}"
@@ -73,15 +77,24 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          uv run mike deploy \
-            -F requipso/docs/mkdocs.yml \
-            --push \
-            --update-aliases \
-            --alias-type redirect \
-            --title "$GITHUB_REF_NAME" \
-            "$version" latest
-          uv run mike set-default \
-            -F requipso/docs/mkdocs.yml \
-            --push \
-            latest
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            version="${GITHUB_REF_NAME#v}"
+            uv run mike deploy \
+              -F requipso/docs/mkdocs.yml \
+              --push \
+              --update-aliases \
+              --alias-type redirect \
+              --title "$GITHUB_REF_NAME" \
+              "$version" latest
+            uv run mike set-default \
+              -F requipso/docs/mkdocs.yml \
+              --push \
+              latest
+          else
+            uv run mike deploy \
+              -F requipso/docs/mkdocs.yml \
+              --push \
+              --alias-type redirect \
+              --title "main" \
+              main
+          fi
