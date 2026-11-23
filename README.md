@@ -1,5 +1,7 @@
 # Requipso
 
+📘 [Documentation](https://ipsosante.github.io/requipso/latest/) 📙
+
 ## Installation
 
 Tout d'abord les dépendances:
