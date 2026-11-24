@@ -24,6 +24,7 @@ validation:
 
 theme:
   name: material
+  custom_dir: overrides
   language: fr
   features:
     - navigation.tabs
@@ -55,6 +56,7 @@ theme:
 plugins:
   - search:
       lang: fr
+  - meta
   - macros:
       module_name: macros
       on_error_fail: true
