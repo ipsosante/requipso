@@ -1,6 +1,6 @@
 [project]
 name = "requipso"
-version = "0.2.4"
+version = "0.2.5"
 description = "Requêteur de données de santé ipso santé"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
