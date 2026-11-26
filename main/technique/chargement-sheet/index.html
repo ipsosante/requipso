@@ -2119,6 +2119,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="build() : le pipeline d&#39;inclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#branche-sinon-negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Branche « sinon » : Negation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2406,6 +2423,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="build() : le pipeline d&#39;inclusion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#branche-sinon-negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Branche « sinon » : Negation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2540,6 +2574,20 @@ sous-blocs s'appellent <code>&lt;nom&gt;_&lt;i&gt;</code>.</p>
 <li>Pour chaque groupe : construction du bloc, puis
    <code>pipeline.add_step(block, text=..., excluded_text=..., parent_step=...)</code>.</li>
 </ol>
+<h3 id="branche-sinon-negation">Branche « sinon » : <code>Negation</code><a class="headerlink" href="#branche-sinon-negation" title="Permanent link">&para;</a></h3>
+<p><code>Negation</code> n'est pas un <code>TableBlock</code> et n'est pas dans le registre. Quand la première ligne d'un
+groupe a <code>block_type = Negation</code> (<code>NEGATION_BLOCK_TYPE</code>), <code>build()</code> appelle <code>build_negation(group,
+pipeline)</code> au lieu de <code>build_block_for_group</code>. Il :</p>
+<ol>
+<li>lit le nom de l'étape cible dans <code>value</code> et la cherche dans <code>pipeline.steps_names</code> (elle doit être
+   définie plus haut) ;</li>
+<li>prend son parent avec <code>pipeline.parent_of(target)</code> (erreur si la cible est la racine) et l'utilise
+   comme <code>parent_step</code> ;</li>
+<li>refuse un groupe de plusieurs lignes, un <code>parent_step</code> ou un <code>excluded_text</code> renseigné, un
+   <code>excluded_text</code> sur la cible, et toute autre colonne de paramètre ou <code>supplementary_params</code>.</li>
+</ol>
+<p>Dans <code>build_block_from_row</code> (onglet <code>Descriptive_table</code>, ou ligne d'un groupe), <code>Negation</code> lève une
+erreur.</p>
 <h2 id="build_descriptive-le-tableau-descriptif"><code>build_descriptive()</code> : le tableau descriptif<a class="headerlink" href="#build_descriptive-le-tableau-descriptif" title="Permanent link">&para;</a></h2>
 <ol>
 <li><code>fetch_populations()</code> lit la ligne 2 de <code>Project</code> : A2 doit valoir <code>Populations</code>, les cellules

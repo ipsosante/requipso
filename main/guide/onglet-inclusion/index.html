@@ -658,6 +658,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple : « si … sinon … » avec Negation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bonnes-pratiques" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2376,6 +2387,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemple : « si … sinon … » avec Negation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#bonnes-pratiques" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2471,7 +2493,7 @@ Les valeurs par défaut des blocs sont prévues pour ça (ex. <code>Age</code> �
 <tr>
 <td><code>value</code></td>
 <td>Selon le bloc</td>
-<td>La valeur principale du bloc (codes CIM10, libellé de biométrie…).</td>
+<td>La valeur principale du bloc (codes CIM10, libellé de biométrie…). Pour <code>Negation</code>, le nom de l'étape à inverser.</td>
 </tr>
 <tr>
 <td><code>agg_func</code></td>
@@ -2628,6 +2650,85 @@ parent</strong> :</p>
 dernière étape de la branche principale ». Après avoir défini des branches, renseignez toujours
 explicitement <code>parent_step</code>.</p>
 </div>
+<h2 id="negation">Exemple : « si … sinon … » avec <code>Negation</code><a class="headerlink" href="#negation" title="Permanent link">&para;</a></h2>
+<p>Pour un arbre de décision (« si le patient est diabétique, appliquer ces étapes, sinon celles-ci »),
+utilisez le bloc <code>Negation</code>. Une étape <code>Negation</code> garde les patients de l'étape parente que l'étape
+indiquée dans <code>value</code> <strong>n'a pas retenus</strong> (y compris ceux pour lesquels elle ne trouve rien). Elle est
+placée automatiquement à côté de cette étape, sous le <strong>même parent</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>block_name</th>
+<th>parent_step</th>
+<th>text</th>
+<th>block_type</th>
+<th>value</th>
+<th>post_func</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>adultes</code></td>
+<td></td>
+<td>Patients majeurs</td>
+<td><code>Age</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>diabete</code></td>
+<td></td>
+<td>Diabétiques</td>
+<td><code>CIM10</code></td>
+<td><code>E11</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>insuline</code></td>
+<td></td>
+<td>Sous insuline</td>
+<td><code>PrescriptionATC</code></td>
+<td><code>A10A</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>non_diabete</code></td>
+<td></td>
+<td>Non diabétiques</td>
+<td><code>Negation</code></td>
+<td><code>diabete</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ages</code></td>
+<td></td>
+<td>50 ans et plus</td>
+<td><code>Age</code></td>
+<td></td>
+<td><code>x&gt;=50</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>flowchart TB
+    a["Patients majeurs (n=…)"] --&gt; d["Diabétiques (n=…)"]
+    a --&gt; nd["Non diabétiques (n=…)"]
+    d --&gt; i["Sous insuline (n=…)"]
+    nd --&gt; g["50 ans et plus (n=…)"]</code></pre>
+<p><code>diabete</code> et <code>non_diabete</code> partagent les patients de <code>adultes</code> : leurs effectifs s'additionnent.
+<code>ages</code> s'enchaîne sur <code>non_diabete</code> (l'étape juste au-dessus).</p>
+<p>Règles du bloc <code>Negation</code> :</p>
+<ul>
+<li><code>value</code> contient le <code>block_name</code> de l'étape à inverser, définie <strong>plus haut</strong>. Cette étape peut être
+  un <a href="../combiner-blocs/">groupe de lignes</a> mais pas la première étape de l'onglet.</li>
+<li><code>parent_step</code> reste vide : le parent est celui de l'étape inversée.</li>
+<li><code>excluded_text</code> reste vide, sur l'étape <code>Negation</code> <strong>et</strong> sur l'étape inversée : les patients non
+  retenus d'une branche ne sont pas exclus, ils sont dans l'autre branche.</li>
+<li>Les autres colonnes de paramètres (<code>post_func</code>, <code>date_sql</code>, <code>supplementary_params</code>…) restent vides,
+  et <code>Negation</code> ne peut pas être groupée avec d'autres lignes.</li>
+<li>Une étape <code>Negation</code> n'a pas de dates : elle ne peut pas servir de <code>reference_date_block</code>.</li>
+<li>Elle n'est utilisable que dans l'onglet <code>Inclusion</code>. Comme toute étape, elle peut servir de
+  population pour le tableau descriptif.</li>
+</ul>
 <h2 id="bonnes-pratiques">Bonnes pratiques<a class="headerlink" href="#bonnes-pratiques" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Construisez progressivement</strong> : ajoutez une étape, lancez, vérifiez les effectifs, puis continuez.</li>

@@ -2106,6 +2106,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#branche-sinon-negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Branche « sinon » : Negation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#execution-iter_run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2321,6 +2332,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#branche-sinon-negation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Branche « sinon » : Negation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#execution-iter_run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2395,10 +2417,27 @@
 </tr>
 </tbody>
 </table>
-<p>Les attributs de nœud <code>text</code>, <code>excluded_text</code> et, après exécution, <code>n</code> servent au dessin.</p>
+<p>Les attributs de nœud <code>text</code>, <code>excluded_text</code> et, après exécution, <code>n</code> servent au dessin.
+<code>parent_of(step)</code> renvoie le parent d'une étape (<code>None</code> pour la racine).</p>
+<h2 id="branche-sinon-negation">Branche « sinon » : <code>Negation</code><a class="headerlink" href="#branche-sinon-negation" title="Permanent link">&para;</a></h2>
+<p><code>Negation(target, name)</code> (<code>requipso/pipes/base.py</code>) est un <code>BaseBlock</code> qui vaut vrai pour les patients
+reçus que <code>target</code> n'a pas retenus :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">pipeline</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">CIM10</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;diabete&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">),</span> <span class="n">parent_step</span><span class="o">=</span><span class="s2">&quot;adultes&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">pipeline</span><span class="o">.</span><span class="n">add_step</span><span class="p">(</span><span class="n">Negation</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">diabete_block</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;non_diabete&quot;</span><span class="p">),</span> <span class="n">parent_step</span><span class="o">=</span><span class="s2">&quot;adultes&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li>Il doit être ajouté avec le <strong>même parent</strong> que <code>target</code>. Il reçoit donc les mêmes <code>patient_ids</code>
+  et <code>n(target) + n(negation) = n(parent)</code>. Le loader s'en charge (voir
+  <a href="../chargement-sheet/#branche-sinon-negation">Chargement du Sheet</a>).</li>
+<li>L'univers est <code>patient_ids</code>, pas le <code>post</code> de <code>target</code> : le <code>post</code> d'un <code>CombinedBlock</code> contient
+  tous les patients de la base (à <code>False</code> hors entrée).</li>
+<li><code>target</code> doit être exécuté avant. <code>dfs_preorder_nodes</code> visite les enfants dans l'ordre d'ajout des
+  arêtes, et <code>target</code> est toujours ajouté avant ; sinon <code>execute</code> lève une erreur.</li>
+<li><code>has_date</code> reste <code>False</code>.</li>
+</ul>
 <h2 id="execution-iter_run">Exécution : <code>iter_run</code><a class="headerlink" href="#execution-iter_run" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">for</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">iter_run</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">step_name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">for</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">iter_run</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">step_name</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
 </code></pre></div>
 <ul>
 <li>Parcours en <strong>profondeur</strong> (<code>nx.dfs_preorder_nodes</code>) depuis <code>source_step</code> : un parent est toujours

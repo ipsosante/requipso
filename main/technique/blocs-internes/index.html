@@ -2450,6 +2450,9 @@
         +operator: list
         +expose_date_for_future_references: list~bool~
     }
+    class Negation {
+        +target: BaseBlock
+    }
     class BlockConfig {
         +output_type: OutputType
         +block_type: patient or event
@@ -2458,8 +2461,10 @@
     }
     BaseBlock &lt;|-- TableBlock
     BaseBlock &lt;|-- CombinedBlock
+    BaseBlock &lt;|-- Negation
     TableBlock --&gt; BlockConfig
     CombinedBlock o-- BaseBlock
+    Negation --&gt; BaseBlock
     TableBlock &lt;|-- Age
     TableBlock &lt;|-- CIM10
     TableBlock &lt;|-- Consultations</code></pre>
@@ -2472,6 +2477,8 @@
   instancier.</li>
 <li><strong><code>CombinedBlock</code></strong> compose plusieurs blocs booléens avec <code>AND</code> / <code>OR</code>. Il peut contenir d'autres
   <code>CombinedBlock</code>.</li>
+<li><strong><code>Negation</code></strong> est le complément d'une autre étape par rapport à son parent, pour les branches
+  « sinon » (voir <a href="../pipeline/#branche-sinon-negation">Le pipeline</a>).</li>
 </ul>
 <h2 id="blockconfig"><code>BlockConfig</code><a class="headerlink" href="#blockconfig" title="Permanent link">&para;</a></h2>
 <p>Chaque bloc concret déclare un attribut de classe <code>config</code> :</p>
