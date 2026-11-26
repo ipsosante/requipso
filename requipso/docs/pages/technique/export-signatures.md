@@ -62,7 +62,10 @@ d'édition sur la feuille.
     - les champs Pydantic de la classe de paramètres, séparés en **communs** (ceux de
       `BlockParams`, avec les valeurs par défaut propres au bloc) et **spécifiques** (tous les
       autres).
-4. Les signatures sont triées par module puis par nom de bloc.
+4. Il ajoute la signature de `Negation` (`_negation_signature`), qui n'est pas un `TableBlock` mais
+   doit apparaître dans `🔒 Blocks`. Elle n'a que `value` (aide tirée de `Negation.value_help`), et
+   sa description vient de `Negation.description`.
+5. Les signatures sont triées par module puis par nom de bloc.
 
 Chaque bloc donne un `BlockSignature` :
 

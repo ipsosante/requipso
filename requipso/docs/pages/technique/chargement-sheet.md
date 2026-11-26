@@ -87,6 +87,22 @@ sous-blocs s'appellent `<nom>_<i>`.
 3. Pour chaque groupe : construction du bloc, puis
    `pipeline.add_step(block, text=..., excluded_text=..., parent_step=...)`.
 
+### Branche « sinon » : `Negation` { #branche-sinon-negation }
+
+`Negation` n'est pas un `TableBlock` et n'est pas dans le registre. Quand la première ligne d'un
+groupe a `block_type = Negation` (`NEGATION_BLOCK_TYPE`), `build()` appelle `build_negation(group,
+pipeline)` au lieu de `build_block_for_group`. Il :
+
+1. lit le nom de l'étape cible dans `value` et la cherche dans `pipeline.steps_names` (elle doit être
+   définie plus haut) ;
+2. prend son parent avec `pipeline.parent_of(target)` (erreur si la cible est la racine) et l'utilise
+   comme `parent_step` ;
+3. refuse un groupe de plusieurs lignes, un `parent_step` ou un `excluded_text` renseigné, un
+   `excluded_text` sur la cible, et toute autre colonne de paramètre ou `supplementary_params`.
+
+Dans `build_block_from_row` (onglet `Descriptive_table`, ou ligne d'un groupe), `Negation` lève une
+erreur.
+
 ## `build_descriptive()` : le tableau descriptif
 
 1. `fetch_populations()` lit la ligne 2 de `Project` : A2 doit valoir `Populations`, les cellules

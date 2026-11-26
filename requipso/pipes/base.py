@@ -4,6 +4,7 @@ This module defines the block hierarchy:
 - BaseBlock: Abstract base defining the pipeline interface (execute/run)
 - TableBlock: For blocks that transform raw database tables (patient or event level)
 - CombinedBlock: For combining multiple boolean blocks with AND/OR logic
+- Negation: Complement of another step with respect to its parent
 """
 
 import datetime
@@ -427,5 +428,62 @@ class CombinedBlock(BaseBlock):
             columns += [pl.col(b.name) for b in self.blocks]
 
         data.all_results[self.name]["post"] = combined.select(columns)
+
+        return data
+
+
+# =============================================================================
+# Negation - Complement of Another Step
+# =============================================================================
+
+
+class Negation(BaseBlock):
+    """Patients of the target step's parent that the target step did not keep.
+
+    Placed in the pipeline as a sibling of ``target`` (same parent), so the
+    ``patient_ids`` it receives are the target's own input patients. Those are
+    used as the universe rather than ``target``'s ``post`` table, because a
+    ``CombinedBlock`` stores ``False`` for every patient of the database.
+    """
+
+    output_type = OutputType.BOOLEAN
+    description = (
+        "Complément d'une étape : patients de l'étape parente non retenus par "
+        "l'étape indiquée dans value. Permet de créer la branche « sinon »."
+    )
+    value_help = (
+        "[HELP] block_name de l'étape à inverser (définie plus haut, pas la "
+        "première étape). Laisser parent_step vide."
+    )
+
+    def __init__(self, target: BaseBlock, name: str | None = None):
+        super().__init__(name=name or f"NOT_{target.name}")
+        self.target = target
+
+    def execute(
+        self,
+        data: Data,
+        reference_date: datetime.datetime | pl.DataFrame | None = None,
+        patient_ids: pl.Series | None = None,
+    ) -> Data:
+        if "post" not in data.all_results[self.target.name]:
+            raise ValueError(
+                f"Step {self.name}: step {self.target.name!r} must be executed first"
+            )
+
+        inputs = (
+            patient_ids.to_frame(name="patient_id")
+            if patient_ids is not None
+            else data.patient.select("patient_id")
+        )
+        target = data.all_results[self.target.name]["post"].select(
+            "patient_id", self.target.name
+        )
+        data.all_results[self.name]["post"] = inputs.join(
+            target, on="patient_id", how="left"
+        ).select(
+            "patient_id",
+            (~pl.col(self.target.name).fill_null(False)).alias(self.name),
+        )
 
         return data

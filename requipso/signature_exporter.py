@@ -35,7 +35,7 @@ from typing import Any, Union, get_args, get_origin
 
 from pydantic import BaseModel
 
-from requipso.pipes.base import TableBlock
+from requipso.pipes.base import Negation, TableBlock
 from requipso.pipes.params import BlockParams
 
 # ---------------------------------------------------------------------------
@@ -231,8 +231,30 @@ class BlockExporter:
                     )
                 )
 
+        signatures.append(self._negation_signature())
         signatures.sort(key=lambda s: (s.module, s.block_name))
         return signatures
+
+    @staticmethod
+    def _negation_signature() -> BlockSignature:
+        """``Negation`` is not a ``TableBlock``: the loader handles it, it only uses ``value``."""
+        return BlockSignature(
+            module=Negation.__module__,
+            block_name=Negation.__name__,
+            block_type="patient",
+            params_name=None,
+            params_module=None,
+            description=Negation.description,
+            common_parameters={
+                "value": {
+                    "type": "str",
+                    "default": Negation.value_help,
+                    "description": Negation.value_help,
+                }
+            },
+            specific_parameters={},
+            has_date=False,
+        )
 
     # -- export: JSON -------------------------------------------------------
 

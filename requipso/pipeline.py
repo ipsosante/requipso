@@ -45,9 +45,10 @@ class Pipeline:
         self.steps_names[step.name] = step
 
         if isinstance(parent_step, str):
-            parent_step = self.steps_names.get(parent_step)
+            parent_name = parent_step
+            parent_step = self.steps_names.get(parent_name)
             if parent_step is None:
-                raise ValueError(f"Parent step {parent_step} not found")
+                raise ValueError(f"Parent step {parent_name} not found")
 
         if self.source_step is None:
             self.source_step = step
@@ -66,6 +67,9 @@ class Pipeline:
             self.steps.add_edge(parent_step, step)
 
         self.last_addded_step = step
+
+    def parent_of(self, step: BaseBlock) -> BaseBlock | None:
+        return next(iter(self.steps.predecessors(step)), None)
 
     def graph(self, save_name: str) -> Digraph:
         return dag_to_consort_flowchart(

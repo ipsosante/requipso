@@ -35,6 +35,7 @@ FAMILIES: dict[str, list[str]] = {
     "Prescriptions": ["PrescriptionATC", "RegexPrescription"],
     "Biométrie": ["Biometry"],
     "Texte libre (NLP)": ["RegexConsultation", "RegexPatientObservation"],
+    "Branches": ["Negation"],
 }
 
 PAGES = {
@@ -55,6 +56,7 @@ PAGES = {
     "Biometry": "biometry.md",
     "RegexConsultation": "regex-consultation.md",
     "RegexPatientObservation": "regex-patient-observation.md",
+    "Negation": "../guide/onglet-inclusion.md#negation",
 }
 
 

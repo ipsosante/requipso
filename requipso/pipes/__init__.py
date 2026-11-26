@@ -29,6 +29,7 @@ from .base import (
     BaseBlock,
     BlockConfig,
     CombinedBlock,
+    Negation,
     OutputType,
     TableBlock,
 )

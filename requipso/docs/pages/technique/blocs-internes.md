@@ -27,6 +27,9 @@ classDiagram
         +operator: list
         +expose_date_for_future_references: list~bool~
     }
+    class Negation {
+        +target: BaseBlock
+    }
     class BlockConfig {
         +output_type: OutputType
         +block_type: patient or event
@@ -35,8 +38,10 @@ classDiagram
     }
     BaseBlock <|-- TableBlock
     BaseBlock <|-- CombinedBlock
+    BaseBlock <|-- Negation
     TableBlock --> BlockConfig
     CombinedBlock o-- BaseBlock
+    Negation --> BaseBlock
     TableBlock <|-- Age
     TableBlock <|-- CIM10
     TableBlock <|-- Consultations
@@ -50,6 +55,8 @@ classDiagram
   instancier.
 - **`CombinedBlock`** compose plusieurs blocs booléens avec `AND` / `OR`. Il peut contenir d'autres
   `CombinedBlock`.
+- **`Negation`** est le complément d'une autre étape par rapport à son parent, pour les branches
+  « sinon » (voir [Le pipeline](pipeline.md#branche-sinon-negation)).
 
 ## `BlockConfig`
 

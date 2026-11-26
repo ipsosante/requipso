@@ -37,6 +37,7 @@ from requipso.pipeline import Pipeline
 from requipso.pipes.base import (
     BaseBlock,
     CombinedBlock,
+    Negation,
     TableBlock,
 )
 from requipso.pipes.params import BlockParams
@@ -61,6 +62,8 @@ COMMON_PARAM_COLUMNS = [
     "reference_date_sql",
     "date_sql",
 ]
+
+NEGATION_BLOCK_TYPE = Negation.__name__
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -193,6 +196,10 @@ def build_block_registry() -> dict[str, type[TableBlock]]:
             ):
                 registry[obj.__name__] = obj
     return registry
+
+
+def _is_empty(value: Any) -> bool:
+    return value is None or bool(pd.isna(value)) or not str(value).strip()
 
 
 def _check_required_columns(
@@ -428,11 +435,16 @@ class PipelineBuilder:
     ) -> BaseBlock:
         """Instantiate a single block from one sheet row."""
         block_type_name = row.block_type
+        if block_type_name == NEGATION_BLOCK_TYPE:
+            raise ValueError(
+                f"Block {name!r}: {NEGATION_BLOCK_TYPE} can only be used alone, "
+                f"in the {PIPELINE_SHEET_NAME!r} sheet."
+            )
         block_cls = self.registry.get(block_type_name)
         if block_cls is None:
             raise ValueError(
                 f"Unknown block type: {block_type_name!r}. "
-                f"Available: {sorted(self.registry)}"
+                f"Available: {sorted([*self.registry, NEGATION_BLOCK_TYPE])}"
             )
 
         params_cls = extract_params_type(block_cls)
@@ -485,6 +497,67 @@ class PipelineBuilder:
             expose_date_for_future_references=expose_date_for_future_references,
         )
 
+    @staticmethod
+    def build_negation(
+        group: RowGroup, pipeline: Pipeline
+    ) -> tuple[Negation, BaseBlock]:
+        """Build a :class:`Negation` step and return it with its parent step.
+
+        The parent is the target step's parent, so both steps split the same
+        patients into two branches.
+        """
+        name = group.name
+        if len(group.rows) != 1:
+            raise ValueError(f"Block {name!r}: {NEGATION_BLOCK_TYPE} cannot be grouped")
+
+        row = group.rows[0]
+        raw_target = row.get("value")
+        if _is_empty(raw_target):
+            raise ValueError(
+                f"Block {name!r}: {NEGATION_BLOCK_TYPE} needs the step to negate in 'value'"
+            )
+        target_name = str(raw_target).strip()
+
+        target = pipeline.steps_names.get(target_name)
+        if target is None:
+            raise ValueError(
+                f"Block {name!r}: step {target_name!r} not found — "
+                f"it must appear earlier in the sheet."
+            )
+        parent = pipeline.parent_of(target)
+        if parent is None:
+            raise ValueError(
+                f"Block {name!r}: the first step ({target_name!r}) cannot be negated"
+            )
+
+        if not _is_empty(group.parent_step):
+            raise ValueError(
+                f"Block {name!r}: leave 'parent_step' empty, the parent of "
+                f"{target_name!r} ({parent.name!r}) is used"
+            )
+        if not _is_empty(group.excluded_text):
+            raise ValueError(
+                f"Block {name!r}: 'excluded_text' must be empty for {NEGATION_BLOCK_TYPE}"
+            )
+        if not _is_empty(pipeline.steps.nodes[target].get("excluded_text")):
+            raise ValueError(
+                f"Block {name!r}: step {target_name!r} is split into two branches, "
+                f"its 'excluded_text' must be empty"
+            )
+
+        unused = [
+            col
+            for col in [*COMMON_PARAM_COLUMNS, "supplementary_params"]
+            if col != "value" and not _is_empty(row.get(col))
+        ]
+        if unused:
+            raise ValueError(
+                f"Block {name!r}: {NEGATION_BLOCK_TYPE} only uses 'value', "
+                f"leave empty: {unused}"
+            )
+
+        return Negation(target=target, name=name), parent
+
     # -- public API ---------------------------------------------------------
 
     def parse(self) -> list[RowGroup]:
@@ -504,17 +577,23 @@ class PipelineBuilder:
         built_blocks: dict[str, BaseBlock] = {}
 
         for group in groups:
-            block = self.build_block_for_group(
-                group,
-                built_blocks,
-                expose_date_for_future_references=group.expose_date_for_future_references,
-            )
+            block: BaseBlock
+            parent_step: BaseBlock | str | None
+            if group.rows[0].block_type == NEGATION_BLOCK_TYPE:
+                block, parent_step = self.build_negation(group, pipeline)
+            else:
+                block = self.build_block_for_group(
+                    group,
+                    built_blocks,
+                    expose_date_for_future_references=group.expose_date_for_future_references,
+                )
+                parent_step = group.parent_step
             built_blocks[group.name] = block
             pipeline.add_step(
                 block,
                 text=group.text,
                 excluded_text=group.excluded_text,
-                parent_step=group.parent_step,
+                parent_step=parent_step,
             )
 
         return pipeline
