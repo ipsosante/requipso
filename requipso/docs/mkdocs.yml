@@ -124,6 +124,8 @@ nav:
           - blocs/regex-prescription.md
       - Biométrie:
           - blocs/biometry.md
+      - Formulaires:
+          - blocs/formulaire.md
       - Texte libre (NLP):
           - blocs/regex-nlp.md
           - blocs/regex-consultation.md

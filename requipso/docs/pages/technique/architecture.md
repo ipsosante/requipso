@@ -60,7 +60,7 @@ Le déroulé d'un clic sur **« (re)lancer la pipeline »** :
 | `requipso/pipes/base.py` | Hiérarchie des blocs : `BaseBlock`, `TableBlock`, `CombinedBlock`. |
 | `requipso/pipes/params.py` | Modèles Pydantic des paramètres (`BlockParams` et dérivés). |
 | `requipso/pipes/processors.py` | `RegexProcessor` (edsnlp) et `RegexParams`. |
-| `requipso/pipes/{patient,atcd,biometry,consultations,insurance,prescription}.py` | Les blocs concrets. |
+| `requipso/pipes/{patient,atcd,biometry,form,consultations,insurance,prescription}.py` | Les blocs concrets. |
 | `requipso/polars.py` | Namespace Polars `df.ipso` (post-traitements utilitaires). |
 | `requipso/completer.py` | Complétion IPython des noms de colonnes dans `pl.col("…")`. |
 | `requipso/signature_exporter.py` | Exporte la signature des blocs vers les onglets `🔒 Blocks` / `🔒 Definitions` ([détail](export-signatures.md)). `scripts/signature_exporter.py` le lance en ligne de commande. |

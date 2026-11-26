@@ -16,6 +16,7 @@ Les tables utilisées par les blocs actuels :
 | `health_professional` | Professionnels de santé. | `Consultations` |
 | `regular_doctor_history` | Périodes de médecin traitant (MT / MTR). | `MedecinTraitant` |
 | `biometry` | Mesures biométriques. | `Biometry` |
+| `form`, `form_answer` | Formulaires remplis par les patients et leurs réponses (scores). | `Formulaire` |
 | `patient_ald` | Affections de longue durée. | `ALD` |
 | `patient_insurance` | Droits d'assurance maladie. | `Insurance` |
 | `drug_prescription`, `drug_posology` | Prescriptions et posologies. | `PrescriptionATC` |
